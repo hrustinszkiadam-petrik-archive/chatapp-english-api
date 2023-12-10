@@ -32,17 +32,10 @@ app.use(
 );
 app.use(cookieParser());
 
-const connectTodb = () => {
-	db.connect((err) => {
-		if (err) {
-			console.error('Error connecting to database: ' + err.stack);
-			setTimeout(connectTodb, 2000);
-		}
-		console.log('Connected to database');
-	});
-};
-
-connectTodb();
+db.connect((err) => {
+	if (err) throw err;
+	console.log('Connected to database');
+});
 
 app.get('/test', (req, res) => {
 	res.json('test ok');
