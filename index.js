@@ -304,7 +304,7 @@ wss.on('connection', async (connection, req) => {
 			const token = tokenString.split('=')[1];
 			if (token) {
 				jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-					if (err) throw err;
+					console.error(err);
 					const { id, username } = decoded;
 					connection.userId = id;
 					connection.username = username;
@@ -314,6 +314,8 @@ wss.on('connection', async (connection, req) => {
 	}
 
 	//* Send online users to clients and the client's conversations
+
+	sendOnlineUsers();
 
 	try {
 		const conversations = await getConversations(connection.userId);
@@ -400,12 +402,5 @@ wss.on('connection', async (connection, req) => {
 				console.error(err);
 			}
 		}
-	});
-
-	sendOnlineUsers();
-
-	connection.on('close', () => {
-		clearInterval(connection.timer);
-		sendOnlineUsers();
 	});
 });
