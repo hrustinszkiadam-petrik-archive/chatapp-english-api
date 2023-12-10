@@ -27,7 +27,7 @@ app.use(
 	cors({
 		credentials: true,
 		methods: ['GET', 'POST', 'DELETE'],
-		origins: 'https://chatapp-english.onrender.com',
+		origin: 'https://chatapp-english.onrender.com',
 	})
 );
 app.use(cookieParser());
