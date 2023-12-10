@@ -299,6 +299,8 @@ wss.on('connection', async (connection, req) => {
 
 	//* Send online users to clients and the client's conversations
 
+	sendOnlineUsers();
+
 	try {
 		const conversations = await getConversations(connection.userId);
 		connection.send(
