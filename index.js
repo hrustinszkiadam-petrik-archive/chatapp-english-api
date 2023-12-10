@@ -283,13 +283,17 @@ wss.on('connection', async (connection, req) => {
 	}
 
 	//* Send online users to clients and the client's conversations
-	const conversations = await getConversations(connection.userId);
 
-	connection.send(
-		JSON.stringify({
-			conversations,
-		})
-	);
+	try {
+		const conversations = await getConversations(connection.userId);
+		connection.send(
+			JSON.stringify({
+				conversations,
+			})
+		);
+	} catch (err) {
+		console.error(err);
+	}
 
 	[...wss.clients].forEach((client) => {
 		client.send(
@@ -367,12 +371,16 @@ wss.on('connection', async (connection, req) => {
 					);
 				});
 		} else if (conversations) {
-			const conversations = await getConversations(connection.userId);
-			connection.send(
-				JSON.stringify({
-					conversations,
-				})
-			);
+			try {
+				const conversations = await getConversations(connection.userId);
+				connection.send(
+					JSON.stringify({
+						conversations,
+					})
+				);
+			} catch (err) {
+				console.error(err);
+			}
 		}
 	});
 });
