@@ -263,6 +263,21 @@ const getConversations = async (userId) => {
 const wss = new WebSocketServer({ server });
 
 wss.on('connection', async (connection, req) => {
+	connection.isAlive = true;
+
+	connection.timer = setInterval(() => {
+		connection.ping();
+		connection.deathTimer = setTimeout(() => {
+			connection.isAlive = false;
+			connection.terminate();
+			console.log('Terminated connection');
+		}, 4000);
+	});
+
+	connection.on('pong', () => {
+		clearTimeout(connection.deathTimer);
+	});
+
 	//* Get userId and username from token
 	const cookies = req.headers.cookie;
 	if (cookies) {
