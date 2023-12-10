@@ -263,6 +263,21 @@ const getConversations = async (userId) => {
 const wss = new WebSocketServer({ server });
 
 wss.on('connection', async (connection, req) => {
+	const sendOnlineUsers = () => {
+		[...wss.clients].forEach((client) => {
+			client.send(
+				JSON.stringify({
+					online: [...wss.clients].map((client) => {
+						return {
+							userId: client.userId,
+							username: client.username,
+						};
+					}),
+				})
+			);
+		});
+	};
+
 	connection.isAlive = true;
 
 	connection.timer = setInterval(() => {
@@ -270,6 +285,7 @@ wss.on('connection', async (connection, req) => {
 		connection.deathTimer = setTimeout(() => {
 			connection.isAlive = false;
 			connection.terminate();
+			sendOnlineUsers();
 			console.log('Terminated connection');
 		}, 4000);
 	});
@@ -309,19 +325,6 @@ wss.on('connection', async (connection, req) => {
 	} catch (err) {
 		console.error(err);
 	}
-
-	[...wss.clients].forEach((client) => {
-		client.send(
-			JSON.stringify({
-				online: [...wss.clients].map((client) => {
-					return {
-						userId: client.userId,
-						username: client.username,
-					};
-				}),
-			})
-		);
-	});
 
 	connection.on('message', async (msg) => {
 		const { message, recipientId, conversations } = JSON.parse(
@@ -397,5 +400,12 @@ wss.on('connection', async (connection, req) => {
 				console.error(err);
 			}
 		}
+	});
+
+	sendOnlineUsers();
+
+	connection.on('close', () => {
+		clearInterval(connection.timer);
+		sendOnlineUsers();
 	});
 });
