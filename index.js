@@ -278,22 +278,6 @@ wss.on('connection', async (connection, req) => {
 		});
 	};
 
-	connection.isAlive = true;
-
-	connection.timer = setInterval(() => {
-		connection.ping();
-		connection.deathTimer = setTimeout(() => {
-			connection.isAlive = false;
-			connection.terminate();
-			sendOnlineUsers();
-			console.log('Terminated connection');
-		}, 4000);
-	});
-
-	connection.on('pong', () => {
-		clearTimeout(connection.deathTimer);
-	});
-
 	//* Get userId and username from token
 	const cookies = req.headers.cookie;
 	if (cookies) {
@@ -315,8 +299,6 @@ wss.on('connection', async (connection, req) => {
 
 	//* Send online users to clients and the client's conversations
 
-	sendOnlineUsers();
-
 	try {
 		const conversations = await getConversations(connection.userId);
 		connection.send(
@@ -327,6 +309,7 @@ wss.on('connection', async (connection, req) => {
 	} catch (err) {
 		console.error(err);
 	}
+	sendOnlineUsers();
 
 	connection.on('message', async (msg) => {
 		const { message, recipientId, conversations } = JSON.parse(
