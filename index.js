@@ -25,9 +25,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(
 	cors({
-		origin: ['http://192.168.0.50:5173', 'http://localhost:5173'],
-		methods: ['GET', 'POST', 'DELETE'],
 		credentials: true,
+		methods: ['GET', 'POST', 'DELETE'],
+		origins: 'https://chatapp-english.onrender.com',
 	})
 );
 app.use(cookieParser());
