@@ -388,4 +388,8 @@ wss.on('connection', async (connection, req) => {
 			}
 		}
 	});
+
+	connection.on('close', () => {
+		sendOnlineUsers();
+	});
 });
